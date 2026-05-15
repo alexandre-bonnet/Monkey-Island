@@ -62,8 +62,11 @@ float octaveNoise(glm::vec2 const& position, std::function<float(glm::vec2 const
     float frequency = params.scale; 
     float maxValue =0.0f;
     for (int i = 0; i<params.octaves;++i){
+        value += noiseFunction(position * frequency) * amplitude;
+        maxValue += amplitude;
+        amplitude *= params.gain;
+        frequency *= params.lacunarity;
 
     }
-    // Temporary fallback return directly from the provided noise function for testing.
-    return noiseFunction(position);
+    return (maxValue > 0.0f) ? (value / maxValue) : 0.0f;
 }
