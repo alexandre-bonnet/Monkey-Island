@@ -84,7 +84,9 @@ void generateHeightmap(AppContext& context) {
     context.heightmapImage = GenImageFromNoiseFunction<float>(resolution, resolution, PIXELFORMAT_UNCOMPRESSED_R32,
         [&](glm::vec2 const& p)->float {
             // TODO(student): implement stack based noise and island mask
-
+        auto noiseFunc = [&](glm::vec2 const& pos) -> float {
+            return perlinNoiseSeeded(pos, context.imageGenerationParameters.noiseSeed);
+        };
             return (perlinNoiseSeeded(p * context.imageGenerationParameters.noiseScale, context.imageGenerationParameters.noiseSeed) * 0.5f + 0.5f);
         });
 
