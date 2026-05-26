@@ -45,10 +45,27 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
 }
 
 void drawImGui(AppContext& context) {
-    if(ImGui::Button("Generate random positions")) {
+    bool regen = false;
+
+    if (ImGui::CollapsingHeader("Fractal Noise (FBM)", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        auto& p = context.imageGenerationParameters;
+        regen |= ImGui::SliderInt  ("Seed", &p.noiseSeed, 0, 6767);
+        regen |= ImGui::SliderInt  ("Resolution", &p.resolution, 32, 1080);
+        regen |= ImGui::SliderInt  ("Octaves", &p.fbmParams.octaves, 1, 10);
+        regen |= ImGui::SliderFloat("Scale", &p.fbmParams.scale, 0.5f, 16.0f);
+        regen |= ImGui::SliderFloat("Lacunarity", &p.fbmParams.lacunarity, 1.0f, 4.0f);
+        regen |= ImGui::SliderFloat("Gain", &p.fbmParams.gain, 0.1f, 1.0f);
+    }
+    if (regen) {
+        generateHeightmap(context);
+        regenerateMeshFromImage(context);
         generateObjectsPositions(context);
     }
 
+    if (ImGui::Button("Generate random positions")) {
+        generateObjectsPositions(context);
+    }
     if (ImGui::CollapsingHeader("objects", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
     }

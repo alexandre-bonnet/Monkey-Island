@@ -3,11 +3,13 @@
 #include "raylib.h"
 #include "glm/glm.hpp"
 #include <vector>
+#include "noise.hpp"
 
 struct ImageGenerationParameters {
     int noiseSeed { 0 };
     float noiseScale { 4.0f };
-    int resolution { 256 };
+    int resolution { 256 }; 
+    FBM fbmParams {};
 };
 
 struct PointsGenerationParameters {
