@@ -91,17 +91,29 @@ void generateHeightmap(AppContext& context) {
 
     // exemple conversion from heightmap to color image
     context.image = TransformImage<float, Color>(context.heightmapImage, [&](float const& v, int const, int const) {
+        Color sand = color_from({ 238, 214, 175 });
+        Color grass = color_from({ 34, 130, 34 });
+        Color snow = color_from({ 200, 200, 200 });
         if (v < 0.3f)
         {
-            return color_from({ 70, 130, 180 }); // water
+            return ColorLerp(DARKBLUE,BLUE,v/0.3f); // water
+        }
+        else if (v < 0.4f)
+        {
+
+            return ColorLerp(BLUE,sand,(v-0.3f)/0.1f);// sand
         }
         else if (v < 0.5f)
         {
-            return color_from({ 238, 214, 175 }); // sand
+
+            return ColorLerp(sand,grass,(v-0.4f)/0.1f);// sand
         }
-        else
+        else if (v < 0.9f)
         {
-            return color_from({ 34, 130, 34 }); // grass
+            return ColorLerp(grass,DARKGREEN,(v-0.8f)/0.4f); // grass
+        } else 
+        {
+            return ColorLerp(grass,snow,(v-0.9f)/0.1f);
         }
         
     }, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
