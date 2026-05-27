@@ -87,7 +87,7 @@ void generateHeightmap(AppContext& context) {
             return perlinNoiseSeeded(pos, context.imageGenerationParameters.noiseSeed);
         };
         glm::vec2 const pCentered = p - glm::vec2{0.5};
-        float factor = 1- glm::smoothstep(0.25f, 1.0f, glm::length(pCentered)/glm::length(glm::vec2{0.5}));
+        float factor = 1- glm::smoothstep(0.05f,1.0f, glm::length(pCentered)/glm::length(glm::vec2{0.5}));
 
         return (octaveNoise(p, noiseFunc, context.imageGenerationParameters.fbmParams) * 0.5f + 0.5f)*factor;
         });
@@ -96,7 +96,7 @@ void generateHeightmap(AppContext& context) {
     context.image = TransformImage<float, Color>(context.heightmapImage, [&](float const& v, int const, int const) {
         Color sand = color_from({ 238, 214, 175 });
         Color grass = color_from({ 34, 130, 34 });
-        Color snow = color_from({ 200, 200, 200 });
+        Color snow = color_from({ 255, 255, 255 });
         if (v < 0.3f)
         {
             return ColorLerp(DARKBLUE,BLUE,v/0.3f); // water
@@ -106,17 +106,17 @@ void generateHeightmap(AppContext& context) {
 
             return ColorLerp(BLUE,sand,(v-0.3f)/0.1f);// sand
         }
-        else if (v < 0.5f)
+        else if (v < 0.45f)
         {
 
-            return ColorLerp(sand,grass,(v-0.4f)/0.1f);// sand
+            return ColorLerp(sand,grass,(v-0.4f)/0.05f);// sand
         }
-        else if (v < 0.9f)
+        else if (v < 0.6f)
         {
-            return ColorLerp(grass,DARKGREEN,(v-0.8f)/0.4f); // grass
+            return ColorLerp(grass,DARKGREEN,(v-0.45f)/0.15f); // grass
         } else 
         {
-            return ColorLerp(grass,snow,(v-0.9f)/0.1f);
+            return ColorLerp(DARKGREEN,snow,(v-0.6f)/0.4f);
         }
         
     }, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
