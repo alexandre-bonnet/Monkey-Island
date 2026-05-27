@@ -8,17 +8,40 @@
 
 
 std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationParameters const& params) {
-    std::vector<glm::vec2> positions {};
+    float const r = params.radius;
+    int const k = params.k;
 
-    positions.reserve(1000);
-    // Naive random generation
-    for (int i {0}; i < 1000; ++i)
-    {
-        positions.emplace_back(
-            static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
-            static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
-        );
-    }
+
+    float const cellSize = r / std::sqrt(2.0f);
+    int const gridW = static_cast<int>(std::ceil(1.0f / cellSize));
+    int const gridH = static_cast<int>(std::ceil(1.0f / cellSize));
+
+    std::vector<int> grid(gridW * gridH, -1);
+
+    auto toCell = [&](glm::vec2 const& p) -> std::pair<int,int> {
+        return {
+            static_cast<int>(p.x / cellSize),
+            static_cast<int>(p.y / cellSize),
+        };
+    };
+
+    auto addPoint = [&](std::vector<glm::vec2>& points, glm::vec2 const& p) {
+        auto [cx, cy] = toCell(p);
+        grid[cy * gridW + cx] = static_cast<int>(points.size());
+        points.push_back(p);
+    };
+
+    // std::vector<glm::vec2> positions {};
+
+    // positions.reserve(1000);
+    // // Naive random generation
+    // for (int i {0}; i < 1000; ++i)
+    // {
+    //     positions.emplace_back(
+    //         static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
+    //         static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
+    //     );
+    // }
 
     // TODO(student): implement Poisson disk sampling to replace the above naive random generation
     // points output should be in [0..1] range, where (0,0) is one corner of the terrain and (1,1) is the opposite corner, so they can be easily scaled to terrain size and sampled from heightmap.
