@@ -31,6 +31,24 @@ std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationPara
         points.push_back(p);
     };
 
+    auto isValid = [&](std::vector<glm::vec2> const& points, glm::vec2 const& candidate) -> bool {
+        if (candidate.x < 0.f || candidate.x >= 1.f ||
+            candidate.y < 0.f || candidate.y >= 1.f) return false;
+        auto [cx, cy] = toCell(candidate);
+        int const search = 2;
+        for (int dy = -search; dy <= search; ++dy) {
+            for (int dx = -search; dx <= search; ++dx) {
+                int nx = cx + dx;
+                int ny = cy + dy;
+                if (nx < 0 || nx >= gridW || ny < 0 || ny >= gridH) continue;
+                int idx = grid[ny * gridW + nx];
+                if (idx == -1) continue;
+                if (glm::distance(candidate, points[idx]) < r) return false;
+            }
+        }
+        return true;
+    };
+
     // std::vector<glm::vec2> positions {};
 
     // positions.reserve(1000);
