@@ -70,8 +70,6 @@ void drawImGui(AppContext& context) {
         ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
     if (ImGui::SliderFloat("Min distance (r)", &context.pointsGenerationParameters.radius, 0.01f, 0.2f))
         generateObjectsPositions(context);
-    if (ImGui::SliderInt("Attempts (k)", &context.pointsGenerationParameters.k, 5, 60))
-        generateObjectsPositions(context);
     }
 
 }

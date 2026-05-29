@@ -14,7 +14,7 @@ struct ImageGenerationParameters {
 
 struct PointsGenerationParameters {
     float radius = 0.05f;
-    int k = 30;
+    int const k = 30;
 };
 
 struct AppContext {
