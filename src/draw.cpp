@@ -32,12 +32,11 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
     float const cubeHalfHeight { 0.5f * context.cubeScale };
 
     for (glm::vec3 const& pos : context.objectPositions) {
-        if( pos.z*context.terrainSize.y>1.9){
-            Matrix const objectTranslation { MatrixTranslate(
-                pos.x * context.terrainSize.x,
+        Matrix const objectTranslation { MatrixTranslate(
+            pos.x * context.terrainSize.x,
                 pos.z * context.terrainSize.y + cubeHalfHeight,
-                pos.y * context.terrainSize.z
-            )};
+            pos.y * context.terrainSize.z
+        )};
             
             Matrix const centeredTranslation { MatrixMultiply(objectTranslation, terrainCentering) };
             Matrix const scale { MatrixScale(context.cubeScale, context.cubeScale, context.cubeScale) };
@@ -45,12 +44,12 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
             
             Vector3 treePos = {
                 transform.m12,
-                transform.m13-0.08f,
+                transform.m13-0.8f*context.cubeScale,
                 transform.m14
             };
 
             if( pos.z*context.terrainSize.y<2.3f){
-              DrawModel(context.palm_tree,treePos, 0.008f ,DARKGREEN);
+              DrawModel(context.palm_tree,treePos, 0.08f*context.cubeScale ,DARKGREEN);
             }
             if( pos.z*context.terrainSize.y>2.3f){
               context.cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = GRAY;
@@ -61,7 +60,6 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
               DrawMesh(context.cube, context.cubeMaterial, transform);
             }
         }
-    }
 }
 
 void drawImGui(AppContext& context) {

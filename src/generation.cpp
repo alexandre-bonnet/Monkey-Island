@@ -80,12 +80,14 @@ void generateObjectsPositions(AppContext& context) {
     context.objectPositions.reserve(positions.size());
     for (glm::vec2 const& p : positions)
     {
-        context.objectPositions.emplace_back(
-            p.x, // x
-            p.y, // y
-            // sample height from heightmap for each point (asuming positions are normalized in [0..1] range)
-            sampleHeightmap(context, p.x, p.y)
-        );
+        if(sampleHeightmap(context, p.x, p.y)>0.37){
+            context.objectPositions.emplace_back(
+                p.x, // x
+                p.y, // y
+                // sample height from heightmap for each point (asuming positions are normalized in [0..1] range)
+                sampleHeightmap(context, p.x, p.y)
+            );
+        }
     }
     // TODO(student): extension - filter positions by sampled height range.
 }
@@ -142,17 +144,20 @@ void generateHeightmap(AppContext& context) {
 
     // exemple conversion from heightmap to color image
     context.image = TransformImage<float, Color>(context.heightmapImage, [&](float const& v, int const, int const) {
+        Color deepOcean = DARKBLUE;
+        Color ocean = BLUE;
         Color sand = color_from({ 238, 214, 175 });
         Color grass = color_from({ 34, 130, 34 });
-        Color snow = color_from({ 255, 255, 255 });
+        Color highGrass = DARKGREEN;
+        Color snow = color_from({ 255, 255, 255 }); 
         if (v < 0.3f)
         {
-            return ColorLerp(DARKBLUE,BLUE,v/0.3f); // water
+            return ColorLerp(deepOcean,ocean,v/0.3f); // water
         }
         else if (v < 0.4f)
         {
 
-            return ColorLerp(BLUE,sand,(v-0.3f)/0.1f);// sand
+            return ColorLerp(ocean,sand,(v-0.3f)/0.1f);// sand
         }
         else if (v < 0.45f)
         {
@@ -161,10 +166,10 @@ void generateHeightmap(AppContext& context) {
         }
         else if (v < 0.6f)
         {
-            return ColorLerp(grass,DARKGREEN,(v-0.45f)/0.15f); // grass
+            return ColorLerp(grass,highGrass,(v-0.45f)/0.15f); // grass
         } else 
         {
-            return ColorLerp(DARKGREEN,snow,(v-0.6f)/0.4f);
+            return ColorLerp(highGrass,snow,(v-0.6f)/0.4f);
         }
         
     }, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
