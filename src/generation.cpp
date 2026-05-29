@@ -7,23 +7,71 @@
 #include <algorithm> // for std::clamp
 
 
-std::vector<glm::vec2> generate2DPositions([[maybe_unused]] PointsGenerationParameters const& params) {
-    std::vector<glm::vec2> positions {};
+std::vector<glm::vec2> generate2DPositions(PointsGenerationParameters const& params)
+{
+    float const cell = params.radius / std::sqrt(2.0f);
+    int const gW = static_cast<int>(std::ceil(1.0f / cell));
+    int const gH = static_cast<int>(std::ceil(1.0f / cell));
 
-    positions.reserve(1000);
-    // Naive random generation
-    for (int i {0}; i < 1000; ++i)
-    {
-        positions.emplace_back(
-            static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
-            static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
-        );
+    std::vector<int> grid(gW * gH, -1);
+    std::vector<glm::vec2> points;
+    std::vector<int> active;
+
+    auto rand01 = []() { return static_cast<float>(GetRandomValue(0, INT_MAX)) / INT_MAX; };
+    auto toCell = [&](glm::vec2 p) { return glm::ivec2{ p / cell }; };
+    auto addPoint = [&](glm::vec2 p) {
+        auto c = toCell(p);
+        grid[c.y * gW + c.x] = points.size();
+        active.push_back(points.size());
+        points.push_back(p);
+    };
+
+    auto isValid = [&](glm::vec2 p) {
+        if (p.x < 0 || p.x >= 1 || p.y < 0 || p.y >= 1) return false;
+        auto c = toCell(p);
+        for (int dy = -2; dy <= 2; ++dy)
+        for (int dx = -2; dx <= 2; ++dx) {
+            auto n = c + glm::ivec2{dx, dy};
+            if (n.x < 0 || n.x >= gW || n.y < 0 || n.y >= gH) continue;
+            if (grid[n.y * gW + n.x] != -1 && glm::distance(p, points[grid[n.y * gW + n.x]]) < params.radius) return false;
+        }
+        return true;
+    };
+
+    addPoint({ rand01(), rand01() });
+
+    while (!active.empty()) {
+        int i = GetRandomValue(0, active.size() - 1);
+        glm::vec2 ori = points[active[i]];
+        bool found = false;
+
+        for (int a = 0; a < params.k && !found; ++a) {
+            float angle = rand01() * 2.0f * PI;
+            float dist  = params.radius * (1.0f + rand01());
+            glm::vec2 c = ori + glm::vec2{ std::cos(angle), std::sin(angle) } * dist;
+            if (isValid(c)) { addPoint(c); found = true; }
+        }
+
+        if (!found) { active[i] = active.back(); active.pop_back(); }
     }
+
+    return points;
+}
+
+    // std::vector<glm::vec2> positions {};
+
+    // positions.reserve(1000);
+    // // Naive random generation
+    // for (int i {0}; i < 1000; ++i)
+    // {
+    //     positions.emplace_back(
+    //         static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX),
+    //         static_cast<float>(GetRandomValue(0, INT_MAX)) / static_cast<float>(INT_MAX)
+    //     );
+    // }
 
     // TODO(student): implement Poisson disk sampling to replace the above naive random generation
     // points output should be in [0..1] range, where (0,0) is one corner of the terrain and (1,1) is the opposite corner, so they can be easily scaled to terrain size and sampled from heightmap.
-    return positions;
-}
 
 void generateObjectsPositions(AppContext& context) {
     std::vector<glm::vec2> const positions {generate2DPositions(context.pointsGenerationParameters)};

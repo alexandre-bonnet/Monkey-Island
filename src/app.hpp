@@ -13,7 +13,8 @@ struct ImageGenerationParameters {
 };
 
 struct PointsGenerationParameters {
-    // TODO(student): add parameters for points generation (ex: poisson disk radius, etc).
+    float radius = 0.05f;
+    int k = 30;
 };
 
 struct AppContext {
