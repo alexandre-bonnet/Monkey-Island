@@ -34,13 +34,17 @@ struct AppContext {
     // The generated terrain mesh and model.
     Mesh mesh {};
     Model model {};
-
+    
     std::vector<glm::vec3> objectPositions {};
-
+    
     // A simple cube mesh and material we use to draw objects on the terrain.
     Mesh cube {};
     Material cubeMaterial {};
     float cubeScale { 0.1f };
+    
+    Model palm_tree = LoadModel("../../resources/palm_tree.obj");
+    //Texture2D palm_tree_texture = LoadTexture("../../resources/palm_tree.mtl");
+    //palm_tree.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = palm_tree_texture;
 
     // Parameters for object positions generation
     PointsGenerationParameters pointsGenerationParameters;
