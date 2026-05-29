@@ -9,7 +9,7 @@
 #include "raymath.h"
 
 void draw3DScene(AppContext& context) {
-    ClearBackground(RAYWHITE);
+    ClearBackground(DARKBLUE);
     
     BeginMode3D(context.camera);
 
@@ -18,7 +18,7 @@ void draw3DScene(AppContext& context) {
 
     DrawModel(context.model, terrainCenterOffset, 1.0f, WHITE);
     drawCubes(context, terrainCentering);
-    DrawGrid(20, 1.0f);
+    //DrawGrid(20, 1.0f);
 
     EndMode3D();
 }
@@ -32,15 +32,35 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
     float const cubeHalfHeight { 0.5f * context.cubeScale };
 
     for (glm::vec3 const& pos : context.objectPositions) {
-        Matrix const objectTranslation { MatrixTranslate(
-            pos.x * context.terrainSize.x,
-            pos.z * context.terrainSize.y + cubeHalfHeight,
-            pos.y * context.terrainSize.z
-        )};
-        Matrix const centeredTranslation { MatrixMultiply(objectTranslation, terrainCentering) };
-        Matrix const scale { MatrixScale(context.cubeScale, context.cubeScale, context.cubeScale) };
-        Matrix const transform { MatrixMultiply(scale, centeredTranslation) };
-        DrawMesh(context.cube, context.cubeMaterial, transform);
+        if( pos.z*context.terrainSize.y>1.9){
+            Matrix const objectTranslation { MatrixTranslate(
+                pos.x * context.terrainSize.x,
+                pos.z * context.terrainSize.y + cubeHalfHeight,
+                pos.y * context.terrainSize.z
+            )};
+            
+            Matrix const centeredTranslation { MatrixMultiply(objectTranslation, terrainCentering) };
+            Matrix const scale { MatrixScale(context.cubeScale, context.cubeScale, context.cubeScale) };
+            Matrix const transform { MatrixMultiply(scale, centeredTranslation) };
+            
+            Vector3 treePos = {
+                transform.m12,
+                transform.m13-0.08f,
+                transform.m14
+            };
+
+            if( pos.z*context.terrainSize.y<2.3f){
+              DrawModel(context.palm_tree,treePos, 0.008f ,DARKGREEN);
+            }
+            if( pos.z*context.terrainSize.y>2.3f){
+              context.cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = GRAY;
+              DrawMesh(context.cube, context.cubeMaterial, transform);
+            }
+            if( pos.z*context.terrainSize.y>3){
+              context.cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = DARKBROWN;
+              DrawMesh(context.cube, context.cubeMaterial, transform);
+            }
+        }
     }
 }
 

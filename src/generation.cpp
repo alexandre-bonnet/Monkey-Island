@@ -87,8 +87,8 @@ void generateHeightmap(AppContext& context) {
             return perlinNoiseSeeded(pos, context.imageGenerationParameters.noiseSeed);
         };
         glm::vec2 const pCentered = p - glm::vec2{0.5};
-        float factor = 1- glm::smoothstep(0.05f,1.0f, glm::length(pCentered)/glm::length(glm::vec2{0.5}));
-
+        float factor = 1- glm::smoothstep(0.0f,0.7f, glm::length(pCentered)/glm::length(glm::vec2{0.5}));
+        //return factor;
         return (octaveNoise(p, noiseFunc, context.imageGenerationParameters.fbmParams) * 0.5f + 0.5f)*factor;
         });
 
