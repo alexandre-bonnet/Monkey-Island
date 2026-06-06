@@ -3,10 +3,15 @@
 #include "app.hpp"
 
 #include "generation.hpp"
+#include <iostream>
 
 #include "imgui.h"
 #include "raylib.h"
 #include "raymath.h"
+
+
+int frameCount{0};
+
 
 void draw3DScene(AppContext& context) {
     ClearBackground(context.isNight ? Color{ 5,  10,  40, 255} : DARKBLUE);
@@ -19,12 +24,15 @@ void draw3DScene(AppContext& context) {
     DrawModel(context.model, terrainCenterOffset, 1.0f, WHITE);
     drawCubes(context, terrainCentering);
     //DrawGrid(20, 1.0f);
-
+    frameCount++;
     EndMode3D();
 }
 
+
 void drawCubes(AppContext const& context, Matrix const& terrainCentering)
 {
+    context.palm_tree.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = context.palm_tree_texture;
+
     if (context.objectPositions.empty()) {
         return;
     }
@@ -49,7 +57,7 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
             };
 
             if( pos.z*context.terrainSize.y<2.3f){
-              DrawModel(context.palm_tree,treePos, 0.08f*context.cubeScale ,DARKGREEN);
+              DrawModel(context.palm_tree,treePos, 0.08f*context.cubeScale ,WHITE);
             }
             if( pos.z*context.terrainSize.y>2.3f){
               context.cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = GRAY;
