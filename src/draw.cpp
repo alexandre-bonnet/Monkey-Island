@@ -127,7 +127,10 @@ void drawImGui(AppContext& context) {
     }
  
 }
-
+    if (ImGui::CollapsingHeader("Logo", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Checkbox("Afficher logo", &context.showLogo);
+    }
 }
 
 void drawRaylibUI(AppContext& context) {
@@ -154,5 +157,32 @@ void drawRaylibUI(AppContext& context) {
     }
 
     DrawFPS(10, 10);
+    Texture2D const& logo = context.isNight ? context.logoNight : context.logoDay;
+    if (logo.id > 0 && context.showLogo)
+    {
+        float const screenW = static_cast<float>(GetScreenWidth());
+        float const screenH = static_cast<float>(GetScreenHeight());
+
+        float logoW, logoH, logoX, logoY;
+
+        if (context.isNight)
+        {
+            float const maxW = screenW * 0.25f;
+            float const maxH = screenH * 0.25f;
+            float const scale = std::min(maxW / logo.width, maxH / logo.height);
+            logoW = logo.width * scale;
+            logoH = logo.height * scale;
+        }
+        else
+        {
+            float const scale = std::min(screenW / logo.width, screenH / logo.height);
+            logoW = logo.width * scale;
+            logoH = logo.height * scale;
+        }
+        
+        logoX = (screenW - logoW) * 0.5f;
+        logoY = (screenH - logoH) * 0.5f;
+        DrawTextureEx(logo, { logoX, logoY }, 0.0f, logoW / logo.width, WHITE);
+    }
 }
 
