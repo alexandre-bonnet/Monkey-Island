@@ -9,7 +9,7 @@
 #include "raymath.h"
 
 void draw3DScene(AppContext& context) {
-    ClearBackground(DARKBLUE);
+    ClearBackground(context.isNight ? Color{ 5,  10,  40, 255} : DARKBLUE);
     
     BeginMode3D(context.camera);
 
@@ -91,21 +91,24 @@ void drawImGui(AppContext& context) {
         generateObjectsPositions(context);
     }
 
-    //la zicmu
-    if (ImGui::CollapsingHeader("Musique", ImGuiTreeNodeFlags_DefaultOpen))
+    //mode
+    if (ImGui::CollapsingHeader("Mode", ImGuiTreeNodeFlags_DefaultOpen))
 {
-    if (ImGui::RadioButton("MONKEY ISLAND", context.currentMusic == 1))
+    if (ImGui::Button(context.isNight ? "Jour" : "Nuit"))
     {
+    context.isNight = !context.isNight;
+    generateHeightmap(context);
+    regenerateMeshFromImage(context);
+
+    if (context.isNight) {
         context.currentMusic = 1;
         StopMusicStream(context.music2);
         PlayMusicStream(context.music1);
-    }
-    ImGui::SameLine();
-    if (ImGui::RadioButton("WII SPORT", context.currentMusic == 2))
-    {
+    } else {
         context.currentMusic = 2;
         StopMusicStream(context.music1);
         PlayMusicStream(context.music2);
+    }
     }
 
     static float volume = 1.0f;
@@ -114,6 +117,7 @@ void drawImGui(AppContext& context) {
         SetMusicVolume(context.music1, volume);
         SetMusicVolume(context.music2, volume);
     }
+ 
 }
 
 }
