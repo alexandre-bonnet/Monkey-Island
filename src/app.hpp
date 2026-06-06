@@ -42,9 +42,8 @@ struct AppContext {
     Material cubeMaterial {};
     float cubeScale { 0.1f };
     
-    Model palm_tree = LoadModel("../../resources/palm_tree.obj");
-    //Texture2D palm_tree_texture = LoadTexture("../../resources/palm_tree.mtl");
-    //palm_tree.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = palm_tree_texture;
+    Model palm_tree = LoadModel("../../resources/Palm_Tree.obj");
+    Texture2D palm_tree_texture = LoadTexture("../../resources/Palm_Tree_Texture.png");
 
     // Parameters for object positions generation
     PointsGenerationParameters pointsGenerationParameters;
