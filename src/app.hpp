@@ -50,6 +50,9 @@ struct AppContext {
 
     // Parameters for island generation
     ImageGenerationParameters imageGenerationParameters;
+    Music music1 {};
+    Music music2 {};
+    int   currentMusic { 1 };
 };
 
 Matrix getTerrainCenteringMatrix(AppContext const& context);

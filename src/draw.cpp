@@ -89,6 +89,7 @@ void drawImGui(AppContext& context) {
         generateObjectsPositions(context);
     }
 
+    //objects
     if (ImGui::Button("Generate random positions")) {
         generateObjectsPositions(context);
     }
@@ -97,6 +98,31 @@ void drawImGui(AppContext& context) {
     if (ImGui::SliderFloat("Min distance (r)", &context.pointsGenerationParameters.radius, 0.01f, 0.2f))
         generateObjectsPositions(context);
     }
+
+    //la zicmu
+    if (ImGui::CollapsingHeader("Musique", ImGuiTreeNodeFlags_DefaultOpen))
+{
+    if (ImGui::RadioButton("MONKEY ISLAND", context.currentMusic == 1))
+    {
+        context.currentMusic = 1;
+        StopMusicStream(context.music2);
+        PlayMusicStream(context.music1);
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("WII SPORT", context.currentMusic == 2))
+    {
+        context.currentMusic = 2;
+        StopMusicStream(context.music1);
+        PlayMusicStream(context.music2);
+    }
+
+    static float volume = 1.0f;
+    if (ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f))
+    {
+        SetMusicVolume(context.music1, volume);
+        SetMusicVolume(context.music2, volume);
+    }
+}
 
 }
 

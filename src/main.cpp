@@ -6,9 +6,13 @@
 #include "draw.hpp"
 #include "generation.hpp"
 
+
 int main() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(1280, 720, "IMAC island viewer");
+
+    //music
+    InitAudioDevice();
 
     // Force a regular resizable window state at startup.
     ClearWindowState(FLAG_FULLSCREEN_MODE);
@@ -26,6 +30,11 @@ int main() {
     rlImGuiSetup(true);
 
     AppContext context {};
+
+    //musique
+    context.music1 = LoadMusicStream("../../resources/monkey_island.mp3");
+    context.music2 = LoadMusicStream("../../resources/wii_sport.mp3");
+    PlayMusicStream(context.music1);
 
     context.cube = GenMeshCube(1.0f, 1.0f, 1.0f);
     context.cubeMaterial = LoadMaterialDefault();
@@ -54,6 +63,8 @@ int main() {
 
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+        UpdateMusicStream(context.music1);
+        UpdateMusicStream(context.music2);
         UpdateCamera(&context.camera, CAMERA_ORBITAL);
         BeginDrawing();
 
@@ -67,6 +78,10 @@ int main() {
 
         EndDrawing();
     }
+
+    UnloadMusicStream(context.music1);
+    UnloadMusicStream(context.music2);
+    CloseAudioDevice();
 
     unload(context);
     rlImGuiShutdown();
