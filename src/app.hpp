@@ -53,7 +53,7 @@ struct AppContext {
     Music music1 {};
     Music music2 {};
     int   currentMusic { 1 };
-    bool isNight={false};
+    bool isNight={true};
 };
 
 Matrix getTerrainCenteringMatrix(AppContext const& context);
