@@ -28,8 +28,7 @@ void draw3DScene(AppContext& context) {
     drawCubes(context, terrainCentering);
     //DrawGrid(20, 1.0f);
     drawBoat(context,terrainCentering);
- 
-    std::cout << logoOpacity<<std::endl;
+
     frameCount++;
     EndMode3D();
 }
@@ -39,7 +38,7 @@ void drawBoat(AppContext const& context, Matrix const& terrainCentering){
     context.boat.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = context.boat_texture;
     
     float angle = boatSpeed*frameCount/50.f;
-    boatPos = {6*cos(angle), 2.0, -6*sin(angle)};
+    boatPos = {(6+context.cubeScale*3)*cos(angle), 2.0, (-6-context.cubeScale*3)*sin(angle)};
     DrawModelEx(context.boat,boatPos, { 0.0f, 1.0f, 0.0f }, angle*RAD2DEG-90, boatscale ,baseModelColor);
 
 }
@@ -128,25 +127,10 @@ void drawImGui(AppContext& context) {
     }
     
 
-    //la zicmu
-    if (ImGui::CollapsingHeader("Musique", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        if (ImGui::RadioButton("MONKEY ISLAND", context.currentMusic == 1))
-        {
-            context.currentMusic = 1;
-            StopMusicStream(context.music2);
-            PlayMusicStream(context.music1);
-        }
-        ImGui::SameLine();
-        if (ImGui::RadioButton("WII SPORT", context.currentMusic == 2))
-        {
-            context.currentMusic = 2;
-            StopMusicStream(context.music1);
-            PlayMusicStream(context.music2);
-        }
+
     //mode
     if (ImGui::CollapsingHeader("Mode", ImGuiTreeNodeFlags_DefaultOpen))
-{
+    {
     if (ImGui::Button(context.isNight ? "Jour" : "Nuit"))
     {
     context.isNight = !context.isNight;
@@ -174,8 +158,6 @@ void drawImGui(AppContext& context) {
             SetMusicVolume(context.music2, volume);
         }
     }
-
-}
     if (ImGui::CollapsingHeader("Logo", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Checkbox("Afficher logo", &context.showLogo);
