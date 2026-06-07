@@ -11,7 +11,8 @@
 
 
 int frameCount{0};
-
+Vector3 boatPos = {0,0,0};
+int boatSpeed{1};
 
 void draw3DScene(AppContext& context) {
     ClearBackground(context.isNight ? Color{ 5,  10,  40, 255} : DARKBLUE);
@@ -24,14 +25,26 @@ void draw3DScene(AppContext& context) {
     DrawModel(context.model, terrainCenterOffset, 1.0f, WHITE);
     drawCubes(context, terrainCentering);
     //DrawGrid(20, 1.0f);
+    drawBoat(context,terrainCentering);
     frameCount++;
     EndMode3D();
 }
 
+void drawBoat(AppContext const& context, Matrix const& terrainCentering){
+    Vector3 boatscale = {context.cubeScale, context.cubeScale, context.cubeScale};
+    context.boat.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = context.boat_texture;
+    
+    float angle = boatSpeed*frameCount/50.f;
+    boatPos = {6*cos(angle), 2.0, -6*sin(angle)};
+    DrawModelEx(context.boat,boatPos, { 0.0f, 1.0f, 0.0f }, angle*RAD2DEG-90, boatscale ,WHITE);
+
+}
 
 void drawCubes(AppContext const& context, Matrix const& terrainCentering)
 {
     context.palm_tree.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = context.palm_tree_texture;
+    context.rocks.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = context.rocks_texture;
+    context.house.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = context.house_texture;
 
     if (context.objectPositions.empty()) {
         return;
@@ -50,22 +63,32 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
             Matrix const scale { MatrixScale(context.cubeScale, context.cubeScale, context.cubeScale) };
             Matrix const transform { MatrixMultiply(scale, centeredTranslation) };
             
-            Vector3 treePos = {
-                transform.m12,
-                transform.m13-0.8f*context.cubeScale,
-                transform.m14
-            };
-
+            
             if( pos.z*context.terrainSize.y<2.3f){
+                Vector3 treePos = {
+                    transform.m12,
+                    transform.m13-0.8f*context.cubeScale,
+                    transform.m14
+                };
               DrawModel(context.palm_tree,treePos, 0.08f*context.cubeScale ,WHITE);
             }
-            if( pos.z*context.terrainSize.y>2.3f){
-              context.cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = GRAY;
-              DrawMesh(context.cube, context.cubeMaterial, transform);
+            if( pos.z*context.terrainSize.y>2.3f && pos.z*context.terrainSize.y<3){
+                Vector3 rocksPos = {
+                    transform.m12,
+                    transform.m13-context.cubeScale,
+                    transform.m14
+                };
+                Vector3 rockScale = {0.2f*context.cubeScale, 0.2f*context.cubeScale, 0.2f*context.cubeScale};
+              DrawModelEx(context.rocks,rocksPos,{ 0.0f, 1.0f, 0.0f }, rocksPos.x*RAD2DEG, rockScale,WHITE);
             }
             if( pos.z*context.terrainSize.y>3){
-              context.cubeMaterial.maps[MATERIAL_MAP_DIFFUSE].color = DARKBROWN;
-              DrawMesh(context.cube, context.cubeMaterial, transform);
+                Vector3 housePos = {
+                    transform.m12,
+                    transform.m13-0.2f*context.cubeScale,
+                    transform.m14
+                };
+                Vector3 houseScale = {0.4f*context.cubeScale, 0.4f*context.cubeScale, 0.4f*context.cubeScale};
+              DrawModelEx(context.house,housePos,{ 0.0f, 1.0f, 0.0f }, housePos.x*10000, houseScale,WHITE);
             }
         }
 }
@@ -95,10 +118,28 @@ void drawImGui(AppContext& context) {
     }
     if (ImGui::CollapsingHeader("objects", ImGuiTreeNodeFlags_DefaultOpen)) {
         ImGui::SliderFloat("Cube Scale", &context.cubeScale, 0.01f, 1.0f);
-    if (ImGui::SliderFloat("Min distance (r)", &context.pointsGenerationParameters.radius, 0.01f, 0.2f))
-        generateObjectsPositions(context);
+        if (ImGui::SliderFloat("Min distance (r)", &context.pointsGenerationParameters.radius, 0.01f, 0.2f))
+            generateObjectsPositions(context);
+        ImGui::SliderInt("Boat Speed", &boatSpeed, 1, 20);
     }
+    
 
+    //la zicmu
+    if (ImGui::CollapsingHeader("Musique", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (ImGui::RadioButton("MONKEY ISLAND", context.currentMusic == 1))
+        {
+            context.currentMusic = 1;
+            StopMusicStream(context.music2);
+            PlayMusicStream(context.music1);
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("WII SPORT", context.currentMusic == 2))
+        {
+            context.currentMusic = 2;
+            StopMusicStream(context.music1);
+            PlayMusicStream(context.music2);
+        }
     //mode
     if (ImGui::CollapsingHeader("Mode", ImGuiTreeNodeFlags_DefaultOpen))
 {
@@ -119,13 +160,14 @@ void drawImGui(AppContext& context) {
     }
     }
 
-    static float volume = 1.0f;
-    if (ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f))
-    {
-        SetMusicVolume(context.music1, volume);
-        SetMusicVolume(context.music2, volume);
+        static float volume = 1.0f;
+        if (ImGui::SliderFloat("Volume", &volume, 0.0f, 1.0f))
+        {
+            SetMusicVolume(context.music1, volume);
+            SetMusicVolume(context.music2, volume);
+        }
     }
- 
+
 }
     if (ImGui::CollapsingHeader("Logo", ImGuiTreeNodeFlags_DefaultOpen))
     {
@@ -155,6 +197,9 @@ void drawRaylibUI(AppContext& context) {
 
         DrawCircleV({ px, py }, 2.0f, RED);
     }
+    float const px { preview_x + ((float(boatPos.x))/18.f +0.5f) * preview_w };
+    float const py { preview_y + ((float(boatPos.z))/18.f +0.5f) * preview_h };
+    DrawCircleV({ px,py }, 4.0f, BROWN);
 
     DrawFPS(10, 10);
     Texture2D const& logo = context.isNight ? context.logoNight : context.logoDay;

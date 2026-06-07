@@ -42,8 +42,17 @@ struct AppContext {
     Material cubeMaterial {};
     float cubeScale { 0.1f };
     
-    Model palm_tree = LoadModel("../../resources/Palm_Tree.obj");
-    Texture2D palm_tree_texture = LoadTexture("../../resources/Palm_Tree_Texture.png");
+    Model palm_tree = LoadModel("../../resources/Models/Palm_Tree.obj");
+    Texture2D palm_tree_texture = LoadTexture("../../resources/Textures/Palm_Tree_Texture.png");
+
+    Model rocks = LoadModel("../../resources/Models/Rocks.obj");
+    Texture2D rocks_texture = LoadTexture("../../resources/Textures/Rocks_texture.png");
+
+    Model house = LoadModel("../../resources/Models/House.obj");
+    Texture2D house_texture = LoadTexture("../../resources/Textures/House_texture.png");
+
+    Model boat = LoadModel("../../resources/Models/Boat.obj");
+    Texture2D boat_texture = LoadTexture("../../resources/Textures/Boat_texture.png");
 
     // Parameters for object positions generation
     PointsGenerationParameters pointsGenerationParameters;
