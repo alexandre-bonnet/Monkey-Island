@@ -144,34 +144,35 @@ void generateHeightmap(AppContext& context) {
 
     // exemple conversion from heightmap to color image
     context.image = TransformImage<float, Color>(context.heightmapImage, [&](float const& v, int const, int const) {
-        Color deepOcean = DARKBLUE;
-        Color ocean = BLUE;
-        Color sand = color_from({ 238, 214, 175 });
-        Color grass = color_from({ 34, 130, 34 });
-        Color highGrass = DARKGREEN;
-        Color snow = color_from({ 255, 255, 255 }); 
-        if (v < 0.3f)
-        {
-            return ColorLerp(deepOcean,ocean,v/0.3f); // water
-        }
-        else if (v < 0.4f)
-        {
+    Color deepOcean, ocean, sand, grass, highGrass, snow;
 
-            return ColorLerp(ocean,sand,(v-0.3f)/0.1f);// sand
-        }
-        else if (v < 0.45f)
-        {
+    if (context.isNight) {
+        deepOcean = Color{ 5,  10,  40, 255};
+        ocean = Color{10,  20,  80, 255};
+        sand = Color{90,  80,  55, 255};
+        grass = Color{15,  55,  15, 255};
+        highGrass = Color{10,  35,  10, 255};
+        snow = Color{150, 150, 170, 255};
+    } else {
+        deepOcean = DARKBLUE;
+        ocean = BLUE;
+        sand = color_from({ 238, 214, 175 });
+        grass = color_from({ 34, 130, 34 });
+        highGrass = DARKGREEN;
+        snow = color_from({ 255, 255, 255 });
+    }
 
-            return ColorLerp(sand,grass,(v-0.4f)/0.05f);// sand
-        }
-        else if (v < 0.6f)
-        {
-            return ColorLerp(grass,highGrass,(v-0.45f)/0.15f); // grass
-        } else 
-        {
-            return ColorLerp(highGrass,snow,(v-0.6f)/0.4f);
-        }
-        
+    if (v < 0.3f)
+        return ColorLerp(deepOcean, ocean, v / 0.3f);
+    else if (v < 0.4f)
+        return ColorLerp(ocean, sand, (v - 0.3f) / 0.1f);
+    else if (v < 0.45f)
+        return ColorLerp(sand, grass, (v - 0.4f) / 0.05f);
+    else if (v < 0.6f)
+        return ColorLerp(grass, highGrass, (v - 0.45f) / 0.15f);
+    else
+        return ColorLerp(highGrass, snow, (v - 0.6f) / 0.4f);
+
     }, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
 
     context.texture = LoadTextureFromImage(context.image);

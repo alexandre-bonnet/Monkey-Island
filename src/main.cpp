@@ -30,7 +30,8 @@ int main() {
     rlImGuiSetup(true);
 
     AppContext context {};
-
+    context.logoNight = LoadTexture("../../resources/logo_monkey_island.png");
+    context.logoDay = LoadTexture("../../resources/logo_wii_sport.png");
     //musique
     context.music1 = LoadMusicStream("../../resources/monkey_island.mp3");
     context.music2 = LoadMusicStream("../../resources/wii_sport.mp3");

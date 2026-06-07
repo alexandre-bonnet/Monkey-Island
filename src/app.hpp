@@ -61,7 +61,14 @@ struct AppContext {
     ImageGenerationParameters imageGenerationParameters;
     Music music1 {};
     Music music2 {};
-    int   currentMusic { 1 };
+    int currentMusic {1};
+
+    bool isNight={true};
+
+    Texture2D logoNight {};
+    Texture2D logoDay {};
+    bool showLogo {true};
+    float logoSize {700.f};
 };
 
 Matrix getTerrainCenteringMatrix(AppContext const& context);

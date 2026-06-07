@@ -32,6 +32,8 @@ void unload(AppContext& context) {
     if (context.cube.vertexCount > 0) {
         UnloadMesh(context.cube);
         context.cube = {};
+    UnloadTexture(context.logoNight);
+    UnloadTexture(context.logoDay);
     }
 }
 
