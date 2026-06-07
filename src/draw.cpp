@@ -13,6 +13,8 @@
 int frameCount{0};
 Vector3 boatPos = {0,0,0};
 int boatSpeed{1};
+Color baseModelColor{GRAY};
+int logoOpacity{255};
 
 void draw3DScene(AppContext& context) {
     ClearBackground(context.isNight ? Color{ 5,  10,  40, 255} : DARKBLUE);
@@ -26,6 +28,8 @@ void draw3DScene(AppContext& context) {
     drawCubes(context, terrainCentering);
     //DrawGrid(20, 1.0f);
     drawBoat(context,terrainCentering);
+ 
+    std::cout << logoOpacity<<std::endl;
     frameCount++;
     EndMode3D();
 }
@@ -36,7 +40,7 @@ void drawBoat(AppContext const& context, Matrix const& terrainCentering){
     
     float angle = boatSpeed*frameCount/50.f;
     boatPos = {6*cos(angle), 2.0, -6*sin(angle)};
-    DrawModelEx(context.boat,boatPos, { 0.0f, 1.0f, 0.0f }, angle*RAD2DEG-90, boatscale ,WHITE);
+    DrawModelEx(context.boat,boatPos, { 0.0f, 1.0f, 0.0f }, angle*RAD2DEG-90, boatscale ,baseModelColor);
 
 }
 
@@ -70,7 +74,7 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
                     transform.m13-0.8f*context.cubeScale,
                     transform.m14
                 };
-              DrawModel(context.palm_tree,treePos, 0.08f*context.cubeScale ,WHITE);
+              DrawModel(context.palm_tree,treePos, 0.08f*context.cubeScale ,baseModelColor);
             }
             if( pos.z*context.terrainSize.y>2.3f && pos.z*context.terrainSize.y<3){
                 Vector3 rocksPos = {
@@ -79,7 +83,7 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
                     transform.m14
                 };
                 Vector3 rockScale = {0.2f*context.cubeScale, 0.2f*context.cubeScale, 0.2f*context.cubeScale};
-              DrawModelEx(context.rocks,rocksPos,{ 0.0f, 1.0f, 0.0f }, rocksPos.x*RAD2DEG, rockScale,WHITE);
+              DrawModelEx(context.rocks,rocksPos,{ 0.0f, 1.0f, 0.0f }, rocksPos.x*RAD2DEG, rockScale,baseModelColor);
             }
             if( pos.z*context.terrainSize.y>3){
                 Vector3 housePos = {
@@ -88,7 +92,7 @@ void drawCubes(AppContext const& context, Matrix const& terrainCentering)
                     transform.m14
                 };
                 Vector3 houseScale = {0.4f*context.cubeScale, 0.4f*context.cubeScale, 0.4f*context.cubeScale};
-              DrawModelEx(context.house,housePos,{ 0.0f, 1.0f, 0.0f }, housePos.x*10000, houseScale,WHITE);
+              DrawModelEx(context.house,housePos,{ 0.0f, 1.0f, 0.0f }, housePos.x*10000, houseScale,baseModelColor);
             }
         }
 }
@@ -148,15 +152,18 @@ void drawImGui(AppContext& context) {
     context.isNight = !context.isNight;
     generateHeightmap(context);
     regenerateMeshFromImage(context);
+    logoOpacity = 255;
 
     if (context.isNight) {
         context.currentMusic = 1;
         StopMusicStream(context.music2);
         PlayMusicStream(context.music1);
+        baseModelColor = GRAY;
     } else {
         context.currentMusic = 2;
         StopMusicStream(context.music1);
         PlayMusicStream(context.music2);
+        baseModelColor = WHITE;
     }
     }
 
@@ -203,6 +210,9 @@ void drawRaylibUI(AppContext& context) {
 
     DrawFPS(10, 10);
     Texture2D const& logo = context.isNight ? context.logoNight : context.logoDay;
+    if(logoOpacity>0){ //logoOpacity>0
+        logoOpacity-=3;
+    } 
     if (logo.id > 0 && context.showLogo)
     {
         float const screenW = static_cast<float>(GetScreenWidth());
@@ -227,7 +237,7 @@ void drawRaylibUI(AppContext& context) {
         
         logoX = (screenW - logoW) * 0.5f;
         logoY = (screenH - logoH) * 0.5f;
-        DrawTextureEx(logo, { logoX, logoY }, 0.0f, logoW / logo.width, WHITE);
+        DrawTextureEx(logo, { logoX, logoY }, 0.0f, logoW / logo.width, {255,255,255,(unsigned char)logoOpacity});
     }
 }
 
